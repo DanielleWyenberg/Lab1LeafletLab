@@ -63,3 +63,10 @@ h3{
 .leaflet-popup-content p {
     margin: 0.2em 0;
 }
+
+label {
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 15px;
+}
+

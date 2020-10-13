@@ -55,28 +55,64 @@ function getData(mymap){
             //create attributes array
             var attributes = processData(response);
             
-            //call function to create proportional symbols
+            //call functions to create proportional symbols and sequence controls
+            
+            //define scaleFactor
+            var scaleFactor = calcScaleFactor(response);
             createPropSymbols(response, mymap, attributes);
             createSequenceControls(mymap, attributes);
                      
-            createLegend(mymap, attributes);
+            //createLegend(mymap, attributes);
         }
     });
 }
 
+//Calculate scale factor based on user input
+function calcScaleFactor(){
+    
+    //set default value
+    var scaleFactor = 50;
+    
+    //add buttons for increase and decrease scale factor
+    $('#panel').append('<button class="skip" id="decrease">Decrease Scale Factor</button>');
+    $('#panel').append('<button class="skip" id="increase">Increase Scale Factor</button>');
+    
+    
+    //click listener for button
+    $('.skip').click(function(){
+        
+        //increment or decrement depending on button clicked
+        if ($(this).attr('id') == 'increase'){
+            scaleFactor = scaleFactor + 5;
+             
+        } else if ($(this).attr('id') == 'decrease'){
+            scaleFactor = scaleFactor - 5; 
+        };
+       
+        });
+        return scaleFactor;
+    }
 
 
 //calculate the radius of each proportional symbol
-function calcPropRadius(attValue){
+function calcPropRadius(attValue, scaleFactor){
+    
     //scale factor to adjust symbol size evenly
-    var scaleFactor =50;
+    var scaleFactor = 50;
+    
+                
     //area based on attribute value and sclae factor
     var area = attValue * scaleFactor;
     //radius calculated based on area
     var radius = Math.sqrt(area/Math.PI);
     
-    return radius;
+    return radius;      
+
 }
+
+
+
+
 
 //Add circle markers for point features to the map
 
@@ -140,7 +176,7 @@ function pointToLayer(feature, latlng, attributes){
         },
         click: function(){
             $("#panel").html(panelContent);
-            //for some reason this is not showing up on the panel
+            
         }
     });
 
@@ -212,7 +248,7 @@ function createSequenceControls(mymap, attributes){
 
 //Step 10: Resize proportional symbols according to new attribute values
 function updatePropSymbols(mymap, attribute){
-    console.log(attribute);
+    
     mymap.eachLayer(function(layer){
         if (layer.feature && layer.feature.properties[attribute]){
             //update the layer style and popup
@@ -222,7 +258,9 @@ function updatePropSymbols(mymap, attribute){
             //update each feature's radius based on new attribute values
             var radius = calcPropRadius(props[attribute]);
             layer.setRadius(radius);
-
+            
+            
+            
             //add city to popup content string
             var popupContent = "<p><b>City:</b> " + props.City + "</p>";
 
@@ -241,23 +279,3 @@ function updatePropSymbols(mymap, attribute){
 };
   
 
-function createLegend(mymap, attributes){
-    
-    var LegendControl = L.Control.extend({
-        options: {
-            position: 'bottomleft'
-        },
-
-        onAdd: function (mymap) {
-            // create the control container with a particular class name
-            var container = L.DomUtil.create('div', 'legend-control-container');
-            console.log(container);
-            //PUT YOUR SCRIPT TO CREATE THE TEMPORAL LEGEND HERE
-
-            return container;
-            ;
-        }
-    });
-
-    mymap.addControl(new LegendControl());
-};

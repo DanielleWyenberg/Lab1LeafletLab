@@ -1,4 +1,8 @@
 //function to retrieve the data and place it on the map
+
+
+
+
 function getData(mymap){
     //load the data
     $.ajax("data/citiesData.geojson", {
